@@ -18,6 +18,6 @@ variable "region" {
   default = "us-east"
 }
 
-variable "git_repo" {
-  default = "https://github.com/codingforentrepreneurs/iac-python"
-}
+# variable "git_repo" {
+#   default = "https://github.com/codingforentrepreneurs/iac-python"
+# }
