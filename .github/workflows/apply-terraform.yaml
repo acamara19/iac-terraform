@@ -32,9 +32,9 @@ jobs:
           root_user_pw = "${{ secrets.ROOT_USER_PW }}"
           EOF
       - name: Terraform Init 
-        run: terraform -chdir=./devops/tf init -backend-config=backend
+        run: terraform init -backend-config=backend
       - name: Terraform Validate
-        run: terraform -chdir=./devops/tf validate -no-color
+        run: terraform validate -no-color
       - name: Terraform Apply Changes
-        run: terraform -chdir=./devops/tf apply -auto-approve
+        run: terraform apply -auto-approve
     
