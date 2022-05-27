@@ -20,6 +20,7 @@ jobs:
           skip_region_validation = true
           bucket = "iac-terraform"
           key = "iac-terraform.tfstate"
+          region = "us-east-1"
           endpoint = "us-east-1.linodeobjects.com"
           access_key = "${{ secrets.LINODE_OBJECT_STORAGE_ACCESS_KEY }}"
           secret_key = "${{ secrets.LINODE_OBJECT_STORAGE_SECRET_KEY }}"
@@ -37,4 +38,3 @@ jobs:
         run: terraform -chdir=./devops/tf validate -no-color
       - name: Terraform Apply Changes
         run: terraform -chdir=./devops/tf apply -auto-approve
-    
