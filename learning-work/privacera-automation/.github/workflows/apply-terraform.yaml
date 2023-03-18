@@ -1,0 +1,40 @@
+name: Terraform
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-west-2 # Replace with your own AWS region
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/my-iam-role # Replace with your own IAM role ARN
+          role-duration-seconds: 3600 # Replace with the desired duration of the IAM role session in seconds
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          backend-config: |
+            bucket         = "my-terraform-state-bucket" # Replace with your own S3 bucket name
+            key            = "terraform.tfstate"
+            region         = "${{ env.AWS_REGION }}"
+            dynamodb_table = "my-terraform-state-lock" # Replace with your own DynamoDB table name
+          terraform_version: 1.0.7 # Replace with the desired version of Terraform
+      - name: Terraform Init
+        run: terraform init -input=false
+      - name: Terraform Validate
+        run: terraform validate
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=plan.out
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -input=false plan.out
