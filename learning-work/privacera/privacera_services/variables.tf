@@ -22,3 +22,8 @@ variable "private_subnet_ids" {
   type = list(string)
   description = "List of private subnet IDs to associate with the VPC Endpoints"
 }
+
+variable "s3_bucket_name" {
+  type        = string
+  description = "Name of the S3 bucket where the files will be uploaded"
+}
