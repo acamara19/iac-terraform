@@ -17,3 +17,8 @@ variable "custom_tcp_rules" {
     description = string
   }))
 }
+
+variable "private_subnet_ids" {
+  type = list(string)
+  description = "List of private subnet IDs to associate with the VPC Endpoints"
+}
