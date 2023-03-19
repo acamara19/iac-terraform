@@ -1,31 +1,23 @@
 import os
 import subprocess
 
-def run_terraform_command(command, working_directory=None):
-    process = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=working_directory
+def run_terraform_command(command):
+    result = subprocess.run(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
-    stdout, stderr = process.communicate()
-
-    if process.returncode != 0:
-        print(f"Error: {stderr.decode('utf-8')}")
-        exit(1)
-
-    return stdout.decode('utf-8')
-
-def main():
-    profile_name = "saml"
-    os.environ["TF_VAR_AWS_PROFILE"] = profile_name
-
-    # Get the root directory
-    root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-    # Initialize and apply Terraform
-    run_terraform_command(["terraform", "init"], working_directory=root_directory)
-    run_terraform_command(["terraform", "apply", "-auto-approve"], working_directory=root_directory)
+    print(result.stdout)
+    print(result.stderr)
 
 if __name__ == "__main__":
-    main()
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    root_directory = os.path.abspath(os.path.join(script_directory, ".."))
+
+    os.chdir(root_directory)
+    
+    # Set the AWS_PROFILE environment variable
+    os.environ["AWS_PROFILE"] = "saml"
+
+    run_terraform_command("terraform init")
+    run_terraform_command("terraform validate")
+    run_terraform_command("terraform plan")
+    run_terraform_command("terraform apply -auto-approve")

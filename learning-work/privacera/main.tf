@@ -1,28 +1,29 @@
-provider "aws" {
-  region = "us-west-2"
-  profile = var.AWS_PROFILE
-}
-
 terraform {
   backend "s3" {
-    bucket = "your-s3-bucket-name"
-    key    = "terraform-backend/terraform.tfstate"
-    region = "us-west-2"
+    bucket         = "my-s3-bucket"
+    key            = "terraform-backend/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "my-lock-table"
   }
 }
 
-# Rest of the file remains the same
-
-module "privacera_services" {
-  source = "./privacera_services"
-
-  aws_profile = var.AWS_PROFILE
-  vpc_cidr = var.vpc_cidr
-  vpc_id = var.vpc_id
-  custom_tcp_rules = var.custom_tcp_rules
+provider "aws" {
+  region  = "us-west-2"
+  profile = "saml"
 }
 
-module "privacera_services" {
+locals {
+  files_to_upload = {
+    "privacera/prod_us_6_5" = [
+      "${path.module}/privacera_init_scripts/prod_us_6_5/file1.txt",
+      "${path.module}/privacera_init_scripts/prod_us_6_5/file2.txt",
+      "${path.module}/privacera_init_scripts/prod_us_6_5/file3.txt",
+      "${path.module}/privacera_init_scripts/prod_us_6_5/file4.txt"
+    ]
+  }
+}
+
+module "privacera_module" {
   source = "./privacera_module"
 
   aws_profile         = "saml"
@@ -35,12 +36,13 @@ module "privacera_services" {
 }
 
 output "dxdl_svc_privacera_role_arn" {
-  value = module.privacera_services.dxdl_svc_privacera_role_arn
+  value = module.privacera_module.dxdl_svc_privacera_role_arn
 }
 
 output "privacera_privatelink_security_group_id" {
-  value = module.privacera_services.privacera_privatelink_security_group_id
+  value = module.privacera_module.privacera_privatelink_security_group_id
 }
 
 output "vpc_endpoints" {
-  value
+  value = module.privacera_module.vpc_endpoints
+}
